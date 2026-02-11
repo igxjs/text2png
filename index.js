@@ -2,30 +2,9 @@ const { registerFont, createCanvas } = require("canvas");
 
 /**
  * Convert text to PNG image.
- * @param text
- * @param [options]
- * @param [options.font="30px sans-serif"] css style font
- * @param [options.textAlign="left"] text alignment (left, center, right)
- * @param [options.color="black"] (or options.textColor) text color
- * @param [options.backgroundColor] (or options.bgColor) background color
- * @param [options.lineSpacing=0]
- * @param [options.strokeWidth=0]
- * @param [options.strokeColor='white']
- * @param [options.padding=0] width of the padding area (left, top, right, bottom)
- * @param [options.paddingLeft]
- * @param [options.paddingTop]
- * @param [options.paddingRight]
- * @param [options.paddingBottom]
- * @param [options.borderWidth=0] width of border (left, top, right, bottom)
- * @param [options.borderLeftWidth=0]
- * @param [options.borderTopWidth=0]
- * @param [options.borderRightWidth=0]
- * @param [options.borderBottomWidth=0]
- * @param [options.borderColor="black"] border color
- * @param [options.localFontPath] path to local font (e.g. fonts/Lobster-Regular.ttf)
- * @param [options.localFontName] name of local font (e.g. Lobster)
- * @param [options.output="buffer"] 'buffer', 'stream', 'dataURL', 'canvas's
- * @returns {string} png image buffer
+ * @param {string} text Text to convert
+ * @param {import('./types').Text2PngOptions} options Options
+ * @returns {string|Buffer|import('node:stream').Readable|import('canvas').Canvas} Returns PNG data as specified by options.output
  */
 const text2png = (text, options = {}) => {
   // Options
@@ -33,7 +12,12 @@ const text2png = (text, options = {}) => {
 
   // Register a custom font
   if (options.localFontPath && options.localFontName) {
-    registerFont(options.localFontPath, { family: options.localFontName });
+    try {
+      registerFont(options.localFontPath, { family: options.localFontName });
+    }
+    catch(error) {
+      throw new Error(`Failed to load local font from path: ${options.localFontPath}, error: ${error.message}`);
+    }
   }
 
   const canvas = createCanvas(0, 0);
@@ -117,7 +101,8 @@ const text2png = (text, options = {}) => {
 
   ctx.font = options.font;
   ctx.fillStyle = options.textColor;
-  ctx.antialias = "gray";
+  ctx.antialias = 'gray';
+  ctx.imageSmoothingEnabled = options.imageSmoothingEnabled;
   ctx.textAlign = options.textAlign;
   ctx.lineWidth = options.strokeWidth;
   ctx.strokeStyle = options.strokeColor;
@@ -151,7 +136,7 @@ const text2png = (text, options = {}) => {
 
     ctx.fillText(lineProp.line, x, y);
 
-    if ( options.strokeWidth > 0 ) {
+    if (options.strokeWidth > 0) {
       ctx.strokeText(lineProp.line, x, y);
     }
 
@@ -174,36 +159,38 @@ const text2png = (text, options = {}) => {
 
 function parseOptions(options) {
   return {
-    font: or(options.font, "30px sans-serif"),
-    textAlign: or(options.textAlign, "left"),
-    textColor: or(options.textColor, options.color, "black"),
-    backgroundColor: or(options.bgColor, options.backgroundColor, null),
-    lineSpacing: or(options.lineSpacing, 0),
+    font: orOr(options.font, "30px sans-serif"),
+    textAlign: orOr(options.textAlign, "left"),
+    textColor: orOr(options.textColor, options.color, "black"),
+    backgroundColor: orOr(options.bgColor, options.backgroundColor, null),
+    lineSpacing: orOr(options.lineSpacing, 0),
 
-    strokeWidth: or(options.strokeWidth, 0),
-    strokeColor: or(options.strokeColor, "white"),
+    strokeWidth: orOr(options.strokeWidth, 0),
+    strokeColor: orOr(options.strokeColor, "white"),
 
-    paddingLeft: or(options.paddingLeft, options.padding, 0),
-    paddingTop: or(options.paddingTop, options.padding, 0),
-    paddingRight: or(options.paddingRight, options.padding, 0),
-    paddingBottom: or(options.paddingBottom, options.padding, 0),
+    paddingLeft: orOr(options.paddingLeft, options.padding, 0),
+    paddingTop: orOr(options.paddingTop, options.padding, 0),
+    paddingRight: orOr(options.paddingRight, options.padding, 0),
+    paddingBottom: orOr(options.paddingBottom, options.padding, 0),
 
-    borderLeftWidth: or(options.borderLeftWidth, options.borderWidth, 0),
-    borderTopWidth: or(options.borderTopWidth, options.borderWidth, 0),
-    borderBottomWidth: or(options.borderBottomWidth, options.borderWidth, 0),
-    borderRightWidth: or(options.borderRightWidth, options.borderWidth, 0),
-    borderColor: or(options.borderColor, "black"),
+    borderLeftWidth: orOr(options.borderLeftWidth, options.borderWidth, 0),
+    borderTopWidth: orOr(options.borderTopWidth, options.borderWidth, 0),
+    borderBottomWidth: orOr(options.borderBottomWidth, options.borderWidth, 0),
+    borderRightWidth: orOr(options.borderRightWidth, options.borderWidth, 0),
+    borderColor: orOr(options.borderColor, "black"),
 
-    localFontName: or(options.localFontName, null),
-    localFontPath: or(options.localFontPath, null),
+    localFontName: orOr(options.localFontName, null),
+    localFontPath: orOr(options.localFontPath, null),
 
-    output: or(options.output, "buffer")
+    output: orOr(options.output, "buffer"),
+
+    imageSmoothingEnabled: orOr(options.imageSmoothingEnabled, false)
   };
 }
 
-function or() {
+function orOr() {
   for (const arg of arguments) {
-    if (arg !== undefined && arg !== null && arg !== false && !(typeof arg === 'number' && (Number.isNaN(arg) || arg === 0))) {
+    if (arg !== undefined && arg !== null) {
       return arg;
     }
   }
