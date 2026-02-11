@@ -14,13 +14,13 @@ text2png depends on [node-canvas](https://github.com/Automattic/node-canvas).
 See [node-canvas wiki](https://github.com/Automattic/node-canvas/wiki) on installing node-canvas.
 
 ```
-$ npm install text2png
+$ npm install @igxjs/text2png
 ```
 
 ```js
-var fs = require('fs');
-var text2png = require('text2png');
-fs.writeFileSync('out.png', text2png('Hello!', {color: 'blue'}));
+const fs = require('fs');
+const text2png = require('text2png');
+fs.writeFileSync('out.png', text2png('Hello!', { color: 'blue' }));
 ```
 
 ## Option
