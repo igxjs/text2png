@@ -1,7 +1,7 @@
-import { defineConfig } from "eslint/config";
-import eslintConfigPrettier from "eslint-config-prettier/flat";
+const { defineConfig } = require('eslint/config');
+const eslintConfigPrettier = require('eslint-config-prettier/flat');
 
-export default defineConfig([
+module.exports = defineConfig([
 	{
 		languageOptions: {
 			ecmaVersion: 2022,

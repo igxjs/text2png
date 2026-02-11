@@ -21,20 +21,23 @@ const platform = {
   sunos: "linux"
 }[process.platform];
 
+console.log('Running tests on platform:', platform);
+
 describe("text2png", () => {
   glob
     .sync(path.resolve(__dirname, "testcases", "*.json"))
     .forEach(filePath => {
       const fileName = path.basename(filePath, ".json");
-      console.log(fileName);
+      console.log(' > File:', fileName);
 
-      it("matches " + fileName, () => {
+      it("matches ".concat(fileName), () => {
         const config = JSON.parse(fs.readFileSync(filePath));
         const [, targetPlatform] = fileName.split("_");
 
         if (targetPlatform && targetPlatform !== platform) {
           return;
         }
+
         const platformDir = path.resolve('spec', 'generated', platform);
         if (!fs.existsSync(platformDir)) {
           fs.mkdirSync(platformDir, { recursive: true });
@@ -48,7 +51,7 @@ describe("text2png", () => {
         fs.writeFileSync(path.resolve(platformDir, fullName), generatedBuffer);
         const compareBuffer = fs.readFileSync(path.resolve('spec', 'expected', platform, fullName));
         return new Promise((resolve, reject) => {
-          looksSame(generatedBuffer, compareBuffer, {  }).then((data) => {
+          looksSame(generatedBuffer, compareBuffer, { strict: false }).then((data) => {
             expect(data.equal).toBe(true);
             resolve();
           }).catch(reject);
