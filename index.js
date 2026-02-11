@@ -88,11 +88,10 @@ const text2png = (text, options = {}) => {
     options.paddingBottom;
 
   const hasBorder =
-    false ||
     options.borderLeftWidth ||
     options.borderTopWidth ||
     options.borderRightWidth ||
-    options.borderBottomWidth;
+    options.borderBottomWidth || false;
 
   if (hasBorder) {
     ctx.fillStyle = options.borderColor;
@@ -127,7 +126,7 @@ const text2png = (text, options = {}) => {
   lineProps.forEach(lineProp => {
     // Calculate Y
     let x = 0;
-    let y = max.ascent + offsetY;
+    const y = max.ascent + offsetY;
 
     // Calculate X
     switch (options.textAlign) {
@@ -203,8 +202,8 @@ function parseOptions(options) {
 }
 
 function or() {
-  for (let arg of arguments) {
-    if (typeof arg !== "undefined") {
+  for (const arg of arguments) {
+    if (arg !== undefined && arg !== null && arg !== false && !(typeof arg === 'number' && (Number.isNaN(arg) || arg === 0))) {
       return arg;
     }
   }

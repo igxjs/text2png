@@ -33,13 +33,14 @@
     "LICENSE"
   ],
   "dependencies": {
-    "canvas": "^2.6.0",
-    "commander": "^3.0.1"
+    "canvas": "^3.2.1",
+    "commander": "^14.0.3"
   },
   "devDependencies": {
-    "eslint": "^6.3.0",
-    "eslint-config-prettier": "^6.3.0",
-    "jasmine": "^3.4.0",
-    "looks-same": "^7.2.1"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jasmine": "^6.0.0",
+    "looks-same": "^10.0.1"
   }
 }

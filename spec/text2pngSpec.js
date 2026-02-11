@@ -1,12 +1,13 @@
 /* global expect */
 /* eslint no-console:0 */
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
+
 const glob = require("glob");
+const looksSame = require("looks-same");
 
 const text2png = require("../index.js");
-const looksSame = require("looks-same");
 
 const platform = {
   darwin: "osx",
@@ -30,27 +31,27 @@ describe("text2png", () => {
       it("matches " + fileName, () => {
         const config = JSON.parse(fs.readFileSync(filePath));
         const [, targetPlatform] = fileName.split("_");
+
         if (targetPlatform && targetPlatform !== platform) {
           return;
         }
+        const platformDir = path.resolve('spec', 'generated', platform);
+        if (!fs.existsSync(platformDir)) {
+          fs.mkdirSync(platformDir, { recursive: true });
+        }
 
+        const fullName = fileName.concat('.png');
+        const existingBuffer = fs.existsSync(path.resolve(platformDir, fullName))
+          ? fs.readFileSync(path.resolve(platformDir, fullName))
+          : null;
+        const generatedBuffer = existingBuffer || text2png.apply(text2png, config);
+        fs.writeFileSync(path.resolve(platformDir, fullName), generatedBuffer);
+        const compareBuffer = fs.readFileSync(path.resolve('spec', 'expected', platform, fullName));
         return new Promise((resolve, reject) => {
-          looksSame(
-            text2png.apply(text2png, config),
-            fs.readFileSync(
-              path.join(__dirname, "expected", platform, fileName + ".png")
-            ),
-            {
-              tolerance: 0.2,
-              ignoreAntialiasing: true,
-              antialiasingTolerance: 3
-            },
-            (error, match) => {
-              if (error) reject(error);
-              expect(match.equal).toBe(true, match);
-              resolve();
-            }
-          );
+          looksSame(generatedBuffer, compareBuffer, {  }).then((data) => {
+            expect(data.equal).toBe(true);
+            resolve();
+          }).catch(reject);
         });
       });
     });
