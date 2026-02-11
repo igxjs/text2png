@@ -19,6 +19,9 @@
     "text",
     "png"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "tkrkts <tkrkt2773@gmail.com> (http://github.com/tkrkt)",
   "license": "MIT",
   "bugs": {
