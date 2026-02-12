@@ -30,7 +30,7 @@ const text2png = (text, options = {}) => {
   const offsets = calculateOffsets(canvas, dimensions, options);
 
   // Render text lines
-  renderTextLines(ctx, dimensions.scaledLineProps, dimensions.scaledMax, dimensions.scaledLineHeight, offsets, options);
+  renderTextLines(ctx, dimensions.scaledLineProps, dimensions.scaledMax, dimensions.scaledLineHeight, offsets, options, canvas);
 
   return formatOutput(canvas, options);
 };
@@ -282,11 +282,11 @@ function calculateHorizontalOffset(canvas, dimensions, options) {
 /**
  * Render text lines
  */
-function renderTextLines(ctx, scaledLineProps, scaledMax, scaledLineHeight, offsets, options) {
+function renderTextLines(ctx, scaledLineProps, scaledMax, scaledLineHeight, offsets, options, canvas) {
   let offsetY = options.borderTopWidth + options.paddingTop + offsets.verticalOffset;
 
   scaledLineProps.forEach(lineProp => {
-    const x = calculateTextX(lineProp, scaledMax, offsets.horizontalOffset, options);
+    const x = calculateTextX(lineProp, scaledMax, offsets.horizontalOffset, options, canvas);
     const y = scaledMax.ascent + offsetY;
 
     ctx.fillText(lineProp.line, x, y);
@@ -302,7 +302,7 @@ function renderTextLines(ctx, scaledLineProps, scaledMax, scaledLineHeight, offs
 /**
  * Calculate X position for text based on alignment
  */
-function calculateTextX(lineProp, scaledMax, horizontalOffset, options) {
+function calculateTextX(lineProp, scaledMax, horizontalOffset, options, canvas) {
   switch (options.textAlign) {
     case "start":
     case "left":
@@ -310,7 +310,7 @@ function calculateTextX(lineProp, scaledMax, horizontalOffset, options) {
 
     case "end":
     case "right":
-      return lineProp.right + options.borderRightWidth + options.paddingRight - horizontalOffset;
+      return canvas.width - options.borderRightWidth - options.paddingRight - horizontalOffset;
 
     case "center":
       return (scaledMax.left + scaledMax.right) / 2 + options.borderLeftWidth + options.paddingLeft + horizontalOffset;
