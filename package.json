@@ -32,6 +32,7 @@
     "bin",
     "README.md",
     "index.js",
+    "types.d.ts",
     "package.json",
     "LICENSE"
   ],

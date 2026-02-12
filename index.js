@@ -198,3 +198,5 @@ function orOr() {
 }
 
 module.exports = text2png;
+
+module.exports.text2png = text2png;

@@ -75,4 +75,8 @@ export interface Text2PngOptions {
   imageSmoothingEnabled?: boolean;
 }
 
-export function text2png(text: string, options?: Text2PngOptions): string | Buffer | Readable | Canvas;
+declare function text2png(text: string, options?: Text2PngOptions): string | Buffer | Readable | Canvas;
+
+export default text2png;
+
+export { text2png };
