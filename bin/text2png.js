@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
+
 const commander = require("commander");
-const version = require("../package.json").version;
-const text2png = require("../index.js");
+
+const { version } = require("../package.json");
+const text2png = require('../index.js');
 
 commander
   .version(version)
@@ -18,7 +20,12 @@ commander
   .option("-s, --lineSpacing <number>", "line spacing")
 
   .option("--strokeWidth <number>", "stroke width")
-  .option("--strokeColor <number>", "stroke color")
+  .option("--strokeColor <color>", "stroke color")
+
+  .option("--width <number>", "fixed width in pixels")
+  .option("--height <number>", "fixed height in pixels")
+  .option("--minFontSize <number>", "minimum font size when auto-scaling (default: 8)")
+  .option("--verticalAlign <alignment>", "vertical alignment: top, middle, bottom (default: middle)")
 
   .option(
     "-p, --padding <number>",
@@ -47,40 +54,57 @@ commander
 
   .parse(process.argv);
 
+// Helper function to convert string to number
+const toNumber = value => value ? +value : undefined;
+
+// Helper function to build options object from commander
+const buildOptions = (commander) => ({
+  font: commander.font,
+  textAlign: commander.textAlign,
+  color: commander.color,
+  backgroundColor: commander.backgroundColor,
+  lineSpacing: toNumber(commander.lineSpacing),
+
+  strokeWidth: toNumber(commander.strokeWidth),
+  strokeColor: commander.strokeColor,
+
+  padding: toNumber(commander.padding),
+  paddingLeft: toNumber(commander.paddingLeft),
+  paddingTop: toNumber(commander.paddingTop),
+  paddingRight: toNumber(commander.paddingRight),
+  paddingBottom: toNumber(commander.paddingBottom),
+
+  borderWidth: toNumber(commander.borderWidth),
+  borderLeftWidth: toNumber(commander.borderLeftWidth),
+  borderTopWidth: toNumber(commander.borderTopWidth),
+  borderRightWidth: toNumber(commander.borderRightWidth),
+  borderBottomWidth: toNumber(commander.borderBottomWidth),
+  borderColor: commander.borderColor,
+
+  localFontPath: commander.localFontPath,
+  localFontName: commander.localFontName,
+
+  width: toNumber(commander.width),
+  height: toNumber(commander.height),
+  minFontSize: toNumber(commander.minFontSize),
+  verticalAlign: commander.verticalAlign,
+
+  output: "stream",
+  imageSmoothingEnabled: false
+});
+
 const exec = text => {
-  if ((commander.text || text) && commander.output) {
-    const stream = text2png(commander.text || text, {
-      font: commander.font,
-      textAlign: commander.textAlign,
-      color: commander.color,
-      backgroundColor: commander.backgroundColor,
-      lineSpacing: commander.lineSpacing && +commander.lineSpacing,
-
-      padding: commander.padding && +commander.padding,
-      paddingLeft: commander.paddingLeft && +commander.paddingLeft,
-      paddingTop: commander.paddingTop && +commander.paddingTop,
-      paddingRight: commander.paddingRight && +commander.paddingRight,
-      paddingBottom: commander.paddingBottom && +commander.paddingBottom,
-
-      borderWidth: commander.borderWidth && +commander.borderWidth,
-      borderLeftWidth: commander.borderLeftWidth && +commander.borderLeftWidth,
-      borderTopWidth: commander.borderTopWidth && +commander.borderTopWidth,
-      borderRightWidth:
-        commander.borderRightWidth && +commander.borderRightWidth,
-      borderBottomWidth:
-        commander.borderBottomWidth && +commander.borderBottomWidth,
-      borderColor: commander.borderColor,
-
-      localFontPath: commander.localFontPath,
-      localFontName: commander.localFontName,
-
-      output: "stream"
-    });
-    const outputPath = path.resolve(process.cwd(), commander.output);
-    stream.pipe(fs.createWriteStream(outputPath));
-  } else {
+  const textInput = commander.text || text;
+  
+  if (!textInput || !commander.output) {
     commander.outputHelp();
+    return;
   }
+
+  const options = buildOptions(commander);
+  const stream = text2png(textInput, options);
+  const outputPath = path.resolve(process.cwd(), commander.output);
+  stream.pipe(fs.createWriteStream(outputPath));
 };
 
 if (process.stdin.isTTY) {

@@ -73,6 +73,18 @@ export interface Text2PngOptions {
 
   /** Enable or disable image smoothing (default: false) */
   imageSmoothingEnabled?: boolean;
+
+  /** Fixed width in pixels (optional, defaults to auto-calculated) */
+  width?: number;
+
+  /** Fixed height in pixels (optional, defaults to auto-calculated) */
+  height?: number;
+
+  /** Minimum font size when auto-scaling to fit fixed dimensions (default: 8) */
+  minFontSize?: number;
+
+  /** Vertical alignment when height is fixed (default: "middle") */
+  verticalAlign?: "top" | "middle" | "bottom";
 }
 
 declare function text2png(text: string, options?: Text2PngOptions): string | Buffer | Readable | Canvas;

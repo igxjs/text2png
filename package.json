@@ -1,6 +1,6 @@
 {
   "name": "@igxjs/text2png",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Convert text to png for node.js",
   "main": "index.js",
   "bin": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ibm-garage-experience/text2png.git"
+    "url": "git+https://github.com/igxjs/text2png.git"
   },
   "keywords": [
     "text",
@@ -22,12 +22,12 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "tkrkts <tkrkt2773@gmail.com> (http://github.com/tkrkt)",
+  "author": "Michael",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ibm-garage-experience/text2png/issues"
+    "url": "https://github.com/igxjs/text2png/issues"
   },
-  "homepage": "https://github.com/ibm-garage-experience/text2png#readme",
+  "homepage": "https://github.com/igxjs/text2png#readme",
   "files": [
     "bin",
     "README.md",
